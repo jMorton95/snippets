@@ -8,6 +8,18 @@ module.exports = {
     'ms-4',
     'ms-8',
     'ms-12',
+    'pb-1',
+    'pb-2',
+    'pb-4',
+    'pb-8',
+    'pb-12',
+    'pb-16',
+    'pt-1',
+    'pt-2',
+    'pt-4',
+    'pt-8',
+    'pt-12',
+    'pt-16',
   ],
   theme: {
     fontFamily: {
