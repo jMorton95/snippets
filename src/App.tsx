@@ -22,16 +22,16 @@ const TableOfContents = ({ items }: TableOfContentsProps) => {
 
 const produceItem = (obj: Item) => {
   const gapBottom = `pb-${obj.gapBottom ?? 1}`;
-  const gapTop = `pb-${obj.gapBottom ?? 1}`;
+  const gapTop = `pt-${obj.gapTop ?? 1}`;
   const fontSize = obj.fontSize ?? "";
   return (
     <div className={`ms-${obj.indent} my-4 ${gapTop} ${gapBottom} ${fontSize}`}>
       <div id={obj.id} className="font-semibold">
         {obj.heading}
       </div>
-      {obj.description && <div className="py-2">{obj.description}</div>}
+      {obj.description && <div className="py-2 mb-4">{obj.description}</div>}
       {obj.snippet !== undefined && (
-        <div className="border border-gray-50">
+        <div className="border border-gray-50 mb-4">
           <CopyBlock
             text={obj.snippet.code ?? ""}
             language={obj.snippet.language}
@@ -45,6 +45,7 @@ const produceItem = (obj: Item) => {
           />{" "}
         </div>
       )}
+      {obj.separator == true && <div className="border border-b border-slate-400"></div>}
     </div>
   );
 };

@@ -10,6 +10,7 @@ export type Item = {
   gapBottom?: number;
   gapTop?: number;
   fontSize?: FontSize;
+  separator?: boolean
 };
 
 export type Snippet = {

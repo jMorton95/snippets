@@ -5,7 +5,7 @@ export const dotNetSnippets: Item = {
   indent: 0,
   heading: ".NET Snippets",
   gapBottom: 8,
-  fontSize: "text-2xl",
+  fontSize: "text-4xl",
   next: [
     {
       id: "entity-framework",
@@ -13,7 +13,8 @@ export const dotNetSnippets: Item = {
       heading: "Entity Framework",
       description: "List of Entity Framework Snippets",
       gapBottom: 4,
-      fontSize: "text-xl",
+      fontSize: "text-2xl",
+      separator: true,
       next: [
         {
           id: "base-model",
@@ -41,7 +42,7 @@ export const dotNetSnippets: Item = {
             language: "csharp",
             showLineNumbers: true,
             startingLineNumber: 0,
-            wrapLongLines: true,
+            wrapLongLines: false,
           },
           next: null,
         },
@@ -62,7 +63,7 @@ export const dotNetSnippets: Item = {
             language: "csharp",
             showLineNumbers: true,
             startingLineNumber: 0,
-            wrapLongLines: true,
+            wrapLongLines: false,
           },
           next: null,
         },
@@ -101,14 +102,14 @@ export const dotNetSnippets: Item = {
             language: "csharp",
             showLineNumbers: true,
             startingLineNumber: 0,
-            wrapLongLines: true,
+            wrapLongLines: false,
           },
           next: null,
         },
         {
           id: "onmodelcreating-changes-override",
           indent: 8,
-          heading: "On Model Creating Custom Entity overrides",
+          heading: "Overriding OnModelCreating for Custom Entity property assignment",
           description: "Certain entites require automatic property assignment at the time of creation. Instead of implementing this whenever you create a record for each Entity, you can just define this behaviour by overriding Entity Framework's OnModelCreating method.",
           snippet: {
           code: `
@@ -123,18 +124,89 @@ export const dotNetSnippets: Item = {
           language: "csharp",
           showLineNumbers: true,
           startingLineNumber: 0,
-          wrapLongLines: true,
+          wrapLongLines: false,
         },
-        next: null,
+          next: null,
         },
       ],
     },
     {
-      id: "environment-variables",
+      id: "configuration-extension",
       indent: 4,
-      heading: "Environment Variables",
+      heading: "Configuration Extension",
+      description: "Snippets for abstracting Program.cs service registry & reading AppSettings",
+      gapTop: 12,
+      fontSize: "text-2xl",
+      separator: true,
+      next: [
+        {
+          id: "add-service-collection",
+          indent: 8,
+          heading: "Service Collection Extension",
+          description: "A wrapper class to register all of your custom services, designed for easy chaining and modification. Below example uses a ConnectionSettings (below) service that reads Database Connection String settings from AppSettings.x.json",
+          snippet: {
+            code: `
+            //ServiceConfigurationExtension.cs
+            public static IServiceCollection AddConfiguration(this IServiceCollection services, IConfiguration configuration)
+            {
+                return services
+                    .AddOptions()
+                    .Configure<ConnectionSettings>(configuration.GetSection("ConnectionSettings"))
+            }`,
+            language: "csharp",
+            showLineNumbers: true,
+            startingLineNumber: 0,
+            wrapLongLines: false,
+          },
+          next: null,
+        },
+        {
+          id: "settings-service-extension",
+          indent: 8,
+          heading: "Register Configuration sections.",
+          description: "A wrapper class that reads a section from AppSettings, stores the values in a class and registers it as a service with your application. See above for the code that reads the setting.",
+          snippet: {
+            code: `
+            //appsettings.Environment.json
+            "ConnectionSettings": {
+              "Host": "localhost",
+              "Port": 5432,
+              "DatabaseName": "snippets",
+              "Username": "snippets",
+              "Password": "snippets"
+            },
+
+            //ConnectionSettings.cs
+            public class ConnectionSettings
+            {
+                public string Host { get; set; }
+                public int Port { get; set; }
+                public string DatabaseName { get; set; }
+                public string Username { get; set; }
+                public string Password { get; set; }
+
+                public string ConnectionString(bool includeErrorDetail = false)
+                {
+                    return $"Host={Host};Port={Port};Database={DatabaseName};Username={Username};Password={Password};Include Error Detail={includeErrorDetail}";
+                }
+            }`,
+            language: "csharp",
+            showLineNumbers: true,
+            startingLineNumber: 0,
+            wrapLongLines: false,
+          },
+          next: null,
+        }
+      ],
+    },
+    {
+      id: "environment-management",
+      indent: 4,
+      heading: "Environment Management",
       description: "Snippets to display management of Environment Variables, especially Environment Names",
-      gapTop: 8,
+      gapTop: 12,
+      fontSize: "text-2xl",
+      separator: true,
       next: [
         {
           id: "publish-profile",
@@ -152,7 +224,7 @@ export const dotNetSnippets: Item = {
             language: "csharp",
             showLineNumbers: true,
             startingLineNumber: 0,
-            wrapLongLines: true,
+            wrapLongLines: false,
           },
           next: null
         },
@@ -174,11 +246,155 @@ export const dotNetSnippets: Item = {
             language: "csharp",
             showLineNumbers: true,
             startingLineNumber: 0,
-            wrapLongLines: true,
+            wrapLongLines: false,
           },
           next: null
         }
       ]
-    }
+    },
+    {
+      id: "pagination",
+      indent: 4,
+      heading: "Pagination in Repository",
+      description: "How to set up Pagination through the repository pattern.",
+      gapTop: 12,
+      fontSize: "text-2xl",
+      separator: true,
+      next: [
+        {
+          id: "paged-list-model",
+          indent: 8,
+          heading: "Paged List Model",
+          description: "A standard Class with properties about the overall collection, and a 'Page' of items stored within.",
+          snippet: {
+            code: `
+            //PagedList.cs
+            public class PagedList<T> : PageData where T : class
+            {
+                public List<T> Items { get; set; }
+        
+                public PagedList()
+                {
+                    Items = new List<T>();
+                }
+            }
+        
+            public class PageData
+            {
+                public int PageNumber { get; set; }
+                public int PageSize { get; set; }
+                public int TotalItemCount { get; set; }
+        
+                public bool IsLastPage
+                {
+                    get
+                    {
+                        var lastPageNumber = (int)Math.Ceiling((double)TotalItemCount / PageSize);
+                        return lastPageNumber == PageNumber;
+                    }
+                }
+            }`,
+            language: "csharp",
+            showLineNumbers: true,
+            startingLineNumber: 0,
+            wrapLongLines: false,
+          },
+          next: null
+        },
+        {
+          id: "pages-in-repository",
+          indent: 8,
+          heading: "Using PagedList in Repository",
+          description: "Storing a paged list of the requested Items using the repository pattern.",
+          snippet: {
+            code: `
+            //BaseRepository.cs
+            public async Task<PagedList<T>> GetAllPaged(int pageNumber = 1, int pageSize = 15, string navigationPropertyNames = "")
+            {
+                pageNumber = pageNumber < 1 ? 1 : pageNumber;
+                pageSize = pageSize > 15 ? 15 : pageSize;
+                var query = _databaseContext.Set<T>().AsQueryable();
+                query = HandleNavigationProperties(query, navigationPropertyNames);
+
+                var pagedResults = new PagedList<T>()
+                {
+                    Items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(),
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItemCount = query.Count()
+                };
+
+                return pagedResults;
+            }`,
+            language: "csharp",
+            showLineNumbers: true,
+            startingLineNumber: 0,
+            wrapLongLines: false,
+          },
+          next: null
+        }
+      ]
+    },
+    {
+      id: "repository-extension",
+      indent: 4,
+      heading: "Repository Pattern Snippets",
+      description: "Some common snippets for extending the Repository Pattern",
+      gapTop: 12,
+      fontSize: "text-2xl",
+      separator: true,
+      next: [
+        {
+          id: "custom-where",
+          indent: 8,
+          heading: "Custom Where filter",
+          description: "We can extend our low level Repository in implementing classes by passing a Lamba function down with a DbSet built with Navigation Properties.",
+          snippet: {
+            code: `
+            //BaseRepository.cs
+            public PagedList<T> GetPagedWhere(IQueryable<T> query, Func<T, bool> whereClause, int pageNumber = 1, int pageSize = 15)
+            {
+                pageNumber = pageNumber < 1 ? 1 : pageNumber;
+                pageSize = pageSize > 15 ? 15 : pageSize;
+
+                //Key Detail
+                var result = query.Where(whereClause);
+
+                var pagedResults = new PagedList<T>()
+                {
+                    Items = result.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalItemCount = result.Count()
+                };
+
+                return pagedResults;
+            }
+            
+            //InheritingRepository.cs
+            public class InheritingRepository : BaseRepository<ItemData>, IInheritingRepository
+            {
+                public InheritingRepository(MyDbContext context) : base(context) { }
+        
+                public PagedList<ItemData> GetItemsWhere(Func<T, bool> whereClause)
+                {
+                    var query = _databaseContext.Set<ItemData>().AsQueryable();
+        
+                    return GetPagedWhere(query, whereClause);
+                }
+            }
+
+            //ExampleUsage
+            var pagedItemsWhere(x => x.CreatedDate <= DateTime.UtcNow.AddDays(-1))
+            `,
+            language: "csharp",
+            showLineNumbers: true,
+            startingLineNumber: 0,
+            wrapLongLines: false,
+          },
+          next: null
+        },
+      ]
+    },
   ],
 };
